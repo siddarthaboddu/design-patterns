@@ -1,109 +1,136 @@
 package design.patterns.behavioral;
 
+
 public class CommandExample {
-    
-    class Button{
-        Command command;
-        String name;
+
+    class Editor {
+        String content;
+        private String clipboard;
+
+        private Button copyButton;
+        private Button pasteButton;
+        private Button cutButton;
+        private Button deleteButton;
+
+        Editor(String content){
+            this.content = content;
+            this.clipboard = "";
+        }
+
+        void setCopyButton(Button copyButton){
+            this.copyButton = copyButton;
+        }
+
+        void setPasteButton(Button pasteButton){
+            this.pasteButton = pasteButton;
+        }
+
+        void setCutButton(Button cutButton){
+            this.cutButton = cutButton;
+        }
+
+        void setDeleteButton(Button deleteButton){
+            this.deleteButton = deleteButton;
+        }
+
+        void clickCopyButton(){
+            this.copyButton.execute();
+        }
+
+        void clickPasteButton(){
+            this.pasteButton.execute();
+        }
+
+        void clickCutButton(){
+            this.cutButton.execute();
+        }
+
+        void clickDeleteButton(){
+            this.deleteButton.execute();
+        }
+
+        String getClipBoard(){
+            return this.clipboard;
+        }
+    }
+
+    abstract class Button{
+        Editor editor;
         
-        Button(Command command, String buttonName){
-            this.command = command;
-            this.name = buttonName;
-        }
-
-        void click(){
-            command.execute();
-        }
-    }
-
-    class GUI{
-        Button copyButton;
-        Button pasteButton;
-        Button cutButton;
-        Button deleteButton;
-
-
-        void clickCopy(){
-            copyButton.click();
-        }
-        void clickPaste(){
-            pasteButton.click();
-        }
-        void cutButton(){
-            pasteButton.click();
-        }
-        void deleteButton(){
-            deleteButton.click();
-        }
-
-    }
-
-    abstract class Command{
-        GUI gui;
-        Service service;
-
-        Command(GUI gui, Service service){
-            this.gui = gui;
-            this.service = service;
+        Button(Editor editor){
+            this.editor = editor;
         }
 
         abstract void execute();
     }
 
-    class CopyCommand extends Command{
+    class CopyButton extends Button{
+        CopyButton(Editor editor){
+            super(editor);
 
-        public CopyCommand(GUI gui, Service service){
-            super(gui, service);
         }
-        public void execute(){
-            service.copy(this);
+
+        void execute(){
+            editor.clipboard = editor.content;
         }
     }
 
-    class PasteCommand extends Command{
-        public PasteCommand(GUI gui, Service service){
-            super(gui, service);
+    class PasteButton extends Button{
+        PasteButton(Editor editor){
+            super(editor);
+
         }
-        public void execute(){
-            service.paste(this);
+
+        void execute(){
+            editor.content = editor.clipboard;
         }
     }
 
-    class CutCommand extends Command{
-        public CutCommand(GUI gui, Service service){
-            super(gui, service);
+    class CutButton extends Button{
+        CutButton(Editor editor){
+            super(editor);
         }
-        public void execute(){
-            service.cut(this);
+
+        void execute(){
+            editor.clipboard = editor.content;
+            editor.content = "";
         }
     }
 
-    class DeleteCommand extends Command{
-        public DeleteCommand(GUI gui, Service service){
-            super(gui, service);
+    class DeleteButton extends Button{
+        DeleteButton(Editor editor){
+            super(editor);
         }
-        public void execute(){
-            service.delete(this);
+
+        void execute(){
+            editor.content = "";
         }
     }
-
-    class Service{
-        void copy(Command command){
-        }
-        
-        void paste(Command command){
-        }
-
-        void cut(Command command){
-        }
-
-        void delete(Command command){
-        }
-    }
-
 
     void example(){
+        Editor editor = new Editor("");
+        editor.setCopyButton(new CopyButton(editor));
+        editor.setCutButton(new CutButton(editor));
+        editor.setPasteButton(new PasteButton(editor));
+        editor.setDeleteButton(new DeleteButton(editor));
 
+        System.out.println(String.format("Editor: {content: %s, clipBoard: %s}", editor.content, editor.getClipBoard()));
+        editor.content = "Hello word";
+        System.out.println(String.format("Editor: {content: %s, clipBoard: %s}", editor.content, editor.getClipBoard()));
+        editor.clickCopyButton();
+        System.out.println(String.format("Editor: {content: %s, clipBoard: %s}", editor.content, editor.getClipBoard()));
+        editor.content = "sdfjslkdfjlskdf";
+        System.out.println(String.format("Editor: {content: %s, clipBoard: %s}", editor.content, editor.getClipBoard()));
+        editor.clickPasteButton();
+        System.out.println(String.format("Editor: {content: %s, clipBoard: %s}", editor.content, editor.getClipBoard()));
+        editor.clickCutButton();
+        System.out.println(String.format("Editor: {content: %s, clipBoard: %s}", editor.content, editor.getClipBoard()));
+        editor.content = "lolol";
+        System.out.println(String.format("Editor: {content: %s, clipBoard: %s}", editor.content, editor.getClipBoard()));
+        editor.clickDeleteButton();
+        System.out.println(String.format("Editor: {content: %s, clipBoard: %s}", editor.content, editor.getClipBoard()));
+        editor.clickPasteButton();
+        System.out.println(String.format("Editor: {content: %s, clipBoard: %s}", editor.content, editor.getClipBoard()));
     }
 
     public static void main(String[] args){
